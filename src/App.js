@@ -129,8 +129,9 @@ class App extends Component {
          />
        <Navigation />
        <Logo />
-       <Imagelinkform />
        <Rank />
+       <Imagelinkform />
+       
 
       { /*
       <facerecognition /> */
