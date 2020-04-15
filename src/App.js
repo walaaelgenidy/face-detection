@@ -12,13 +12,14 @@ const app = new Clarifai.App({
   apiKey: '46667303b64c4cb2a1a8a560a30985d0'
  });
  
+ 
 const particlesoptions={
   "particles": {
     "number": {
-      "value": 66,
+      "value": 30,
       "density": {
         "enable": true,
-        "value_area": 631.3480069132609
+        "value_area": 400
       }
     },
     "color": {
@@ -129,26 +130,46 @@ class App extends Component {
      super();
      this.state = {
        input: '' ,
+       imgurl:'',
+       box:{},
      }
   }
+   
+  calculateFaceLocation =(data)=>{
+   const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+   const image = document.getElementById('inputimage');
+   const width = Number(image.width); //string but we want to perform caculations
+   const height = Number(image.height);
+   // console.log(width , height);
+   return {
+    leftCol: clarifaiFace.left_col * width,
+    topRow: clarifaiFace.top_row * height,
+    rightCol: width - (clarifaiFace.right_col * width),
+    bottomRow: height - (clarifaiFace.bottom_row * height)
+  }
+   
+  }
+
+  displayFaceBox = (box) => {
+    console.log(box)
+    this.setState({box: box});
+  }
+
    onInputChange = (event)=>{
-     console.log(event.target.value);
+     this.setState({input: event.target.value});
    }
    onButtonSubmit = ()=>{
+     this.setState({imgurl: this.state.input})
 
-     console.log('click');
-
-     app.models.predict("a403429f2ddf4b49b307e318f00e528b",
-      "https://samples.clarifai.com/face-det.jpg")
-      .then(
-    function(response) {
-      console.log(response);
-    },
-    function(err) {
-      // there was an error
+     app.models
+      .predict(Clarifai.FACE_DETECT_MODEL,
+             this.state.input)
+    .then(response =>this.displayFaceBox(this.calculateFaceLocation(response))) 
+    //So this 'calculateFaceLocation' takes a response 
+    // returns this object and that returned object is now going into 'displayFacebox'.
+    .catch(err=> console.log(err));
+   
     }
-  );
-   }
 
   render()
   {
@@ -163,8 +184,10 @@ class App extends Component {
        <Imagelinkform 
          onInputChange={this.onInputChange}
          onButtonSubmit={this.onButtonSubmit} />
-      <Facerecognition />
-
+      <Facerecognition 
+         imgurl={this.state.imgurl} 
+         box={this.state.box}  />
+        
       </div>
     );
   }
