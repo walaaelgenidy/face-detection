@@ -5,8 +5,6 @@ import Logo from './components/logo/logo';
 import Imagelinkform from './components/imagelinkform/imagelinkform';
 import Rank from './components/rank/rank';
 import Facerecognition from './components/facerecognition/facerecognition';
-import SignIn from './components/signin/signin';
-import Register from './components/register/Register';
 import './App.css';
 import Particles from 'react-particles-js';
 
@@ -134,8 +132,6 @@ class App extends Component {
        input: '' ,
        imgurl:'',
        box:{},
-       route: 'signin',
-       isSignedIn: false
      }
   }
    
@@ -155,7 +151,7 @@ class App extends Component {
   }
 
   displayFaceBox = (box) => {
-  //  console.log(box)
+    console.log(box)
     this.setState({box: box});
   }
 
@@ -174,46 +170,25 @@ class App extends Component {
     .catch(err=> console.log(err));
    
     }
-   onRouteChange =(route)=>{
-     if(route==='signout'){
-      this.setState({isSignedIn:false})
-     }else if(route ==='home'){
-       this.setState({isSignedIn:'true'})
-     }
-     this.setState({route : route});  // dynamically our route is going to be where we give it. 
-     
-   }
-
 
   render()
   {
-  const  {isSignedIn , box , imgurl , route} = this.state;
     return(
       <div className="App">
         <Particles className='particles' 
                 params={particlesoptions}
          />
-
-       <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
-       {route==='home' 
-       ? 
-       <div>
+       <Navigation />
        <Logo />
        <Rank />
        <Imagelinkform 
          onInputChange={this.onInputChange}
          onButtonSubmit={this.onButtonSubmit} />
-       <Facerecognition 
-         imgurl={imgurl} 
-         box={box}  />
-         </div>
-         :(
-         route==='signin'
-         ?<SignIn onRouteChange={this.onRouteChange} />
-         :<Register onRouteChange={this.onRouteChange} />
-       )
-     }
-        </div>
+      <Facerecognition 
+         imgurl={this.state.imgurl} 
+         box={this.state.box}  />
+        
+      </div>
     );
   }
 }
